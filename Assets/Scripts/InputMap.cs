@@ -40,7 +40,7 @@ namespace MirrorYou.Input
                 },
                 {
                     ""name"": ""RightAnalog"",
-                    ""type"": ""Value"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""d3a4385e-79e3-4d0a-bd75-29beac09d4ec"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",

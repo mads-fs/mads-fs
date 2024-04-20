@@ -20,8 +20,10 @@ namespace MirrorYou.Input
         public event Action<int> OnTriggerRightButtonPress = delegate { };
 
         private Vector2 leftAnalog;
+        public float SmoothedLeftAnalogHorizontalAxis { get { return smoothedLeftAnalog.x; } }
         private Vector2 smoothedLeftAnalog;
         private Vector2 rightAnalog;
+        public float SmoothedRightAnalogHorizontalAxis { get { return smoothedRightAnalog.x; } }
         private Vector2 smoothedRightAnalog;
         private Vector2 dpad;
 
