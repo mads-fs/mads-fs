@@ -31,7 +31,7 @@ namespace MirrorYou.Input
             ""actions"": [
                 {
                     ""name"": ""LeftAnalog"",
-                    ""type"": ""Value"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""fff95085-f59c-4ef2-9eb0-12196b9588fe"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -135,7 +135,7 @@ namespace MirrorYou.Input
                     ""id"": ""4fada763-8f6a-4611-bd33-4a77e9b2d972"",
                     ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
-                    ""processors"": ""NormalizeVector2"",
+                    ""processors"": """",
                     ""groups"": ""Controller"",
                     ""action"": ""LeftAnalog"",
                     ""isComposite"": false,
