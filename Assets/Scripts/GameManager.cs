@@ -7,10 +7,10 @@ namespace MirrorYou
 {
     public class GameManager : MonoBehaviour
     {
-        public Color Yellow;
-        public Color Red;
-        public Color Green;
-        public Color Blue;
+        public Color Yellow = Color.yellow;
+        public Color Red = Color.red;
+        public Color Green = Color.green;
+        public Color Blue = Color.blue;
 
         public PlayerInputManager InputManager;
 
