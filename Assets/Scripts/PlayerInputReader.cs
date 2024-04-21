@@ -1,4 +1,3 @@
-using MirrorYou.Extensions;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,9 +6,10 @@ namespace MirrorYou.Input
 {
     public class PlayerInputReader : MonoBehaviour
     {
-        public int XInputSampling = 30;
-        public int YInputSampling = 30;        
+        public int XInputSampling = 100;
+        public int YInputSampling = 100;
 
+        public event Action<int> OnBackButtonPress = delegate { };
         public event Action<int> OnFaceButtonUpPress = delegate { };
         public event Action<int> OnFaceButtonRightPress = delegate { };
         public event Action<int> OnFaceButtonDownPress = delegate { };
@@ -39,11 +39,9 @@ namespace MirrorYou.Input
         private int leftAnalogYInputSampleIndex = -1;
         private int rightAnalogXInputSampleIndex = -1;
         private int rightAnalogYInputSampleIndex = -1;
-        private GameManager gameMgr;
 
         private void Start()
         {
-            gameMgr = FindObjectOfType<GameManager>();
             playerIndex = GetComponent<PlayerInput>().playerIndex;
             quadMat = GetComponent<MeshRenderer>().material;
             leftAnalogXInputSmoothing = new float[XInputSampling];

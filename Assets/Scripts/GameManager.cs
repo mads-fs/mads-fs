@@ -1,8 +1,10 @@
 using MirrorYou.Data;
 using MirrorYou.Extensions;
 using MirrorYou.Input;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace MirrorYou
@@ -26,11 +28,20 @@ namespace MirrorYou
         public float CounterThreshold = 3f;
         public Image CounterCircle;
 
+        public float ShapeAnimationTime = 1f;
+
+        public EndScript EndScript;
+
+        [Header("Audio")]
+        public AudioSource WaterDropletSfx;
+        public AudioSource DingSfx;
+
         private ShapeColor playerShapeColor;
         private ShapeScale playerShapeScale;
         private bool isPlaying;
 
         private float counter = 0f;
+        private bool isAnimatingComputerShape = false;
 
         private void Start()
         {
@@ -47,7 +58,18 @@ namespace MirrorYou
         {
             if (animate)
             {
-                // Animate
+                if (shapeTargetIndex == 0 || target.Equals(ShapeTargets[0]))
+                {
+                    counter = 0f;
+                    Color colorAlpha = CounterCircle.color;
+                    CounterCircle.color = new(colorAlpha.r, colorAlpha.g, colorAlpha.b, 0f);
+                    StartCoroutine(DoComputerShapeAnimation(target, target));
+                }
+                else
+                {
+                    StartCoroutine(DoCounterCircleFadeAnimation(0f, 1f));
+                    StartCoroutine(DoComputerShapeAnimation(ShapeTargets[shapeTargetIndex - 1], target));
+                }
             }
             else
             {
@@ -70,34 +92,40 @@ namespace MirrorYou
 
         private void Update()
         {
+            if(InputGlobal.InputActions.Gamepad.Restart.IsPressed()) SceneManager.LoadScene(0);
             if (isPlaying)
             {
                 CounterCircle.fillAmount = MathExtensions.MapValueToNewScale(counter, 0f, CounterThreshold, 0f, 1f);
                 if (playerInputReaders[0] != null)
                 {
-                    playerInputReaders[0].Morph();
-                    playerInputReaders[0].Displace();
-                    if (CheckProgress())
+                    if (!isAnimatingComputerShape)
                     {
-                        counter += Time.deltaTime;
-                        if(counter >= CounterThreshold)
+                        playerInputReaders[0].Morph();
+                        playerInputReaders[0].Displace();
+                        if (CheckProgress())
                         {
-                            shapeTargetIndex += 1;
-                            if (shapeTargetIndex < ShapeTargets.Length)
+                            counter += Time.deltaTime;
+                            if (counter >= CounterThreshold)
                             {
-                                counter = 0f;
-                                ShapeTarget shape = ShapeTargets[shapeTargetIndex];
-                                ApplyShape(shape, animate: false);
-                            }
-                            else
-                            {
-                                isPlaying = false;
+                                shapeTargetIndex += 1;
+                                if (shapeTargetIndex < ShapeTargets.Length)
+                                {
+                                    ShapeTarget shape = ShapeTargets[shapeTargetIndex];
+                                    WaterDropletSfx.Play();
+                                    ApplyShape(shape, animate: true);
+                                }
+                                else
+                                {
+                                    StartCoroutine(DoCounterCircleFadeAnimation(0f, 1f));
+                                    isPlaying = false;
+                                    EndScript.Play();
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        Debug.Log("Wrong");
+                        else
+                        {
+                            Debug.Log("Wrong");
+                        }
                     }
                 }
             }
@@ -106,12 +134,15 @@ namespace MirrorYou
         private bool CheckProgress()
         {
             if (playerShapeColor != ShapeTargets[shapeTargetIndex].ShapeColor) return false;
+            Debug.Log($"{ShapeTargets[shapeTargetIndex].ShapeScale}");
             if (playerShapeScale != ShapeTargets[shapeTargetIndex].ShapeScale) return false;
-            float leftXDistance = ShapeTargets[shapeTargetIndex].Morph - playerInputReaders[0].SmoothedLeftAnalogHorizontalAxis;
-            Debug.Log(leftXDistance);
+            float leftXDistance = Mathf.Abs(ShapeTargets[shapeTargetIndex].Morph - playerInputReaders[0].SmoothedLeftAnalogHorizontalAxis);
+            Debug.Log($"l:{leftXDistance}");
             if (leftXDistance < 0f || leftXDistance > InputVariance) return false;
-            float rightXDistance = ShapeTargets[shapeTargetIndex].Morph - playerInputReaders[0].SmoothedRightAnalogHorizontalAxis;
+            float rightXDistance = Mathf.Abs(ShapeTargets[shapeTargetIndex].Roughness - playerInputReaders[0].SmoothedRightAnalogHorizontalAxis);
+            Debug.Log($"l:{rightXDistance}");
             if (rightXDistance < 0f || rightXDistance > InputVariance) return false;
+            if (CounterCircle.color.a < 0.001f) StartCoroutine(DoCounterCircleFadeAnimation(1f, 0.3f));
             return true;
         }
 
@@ -130,11 +161,18 @@ namespace MirrorYou
             playerInputReaders[playerIndex].OnShoulderRightButtonPress += GameManager_OnShoulderRightButtonPress;
             playerInputReaders[playerIndex].OnTriggerLeftButtonPress += GameManager_OnTriggerLeftButtonPress;
             playerInputReaders[playerIndex].OnTriggerRightButtonPress += GameManager_OnTriggerRightButtonPress;
+            playerInputReaders[playerIndex].gameObject.transform.localScale = DataExtensions.GetShapeScaleVector(ShapeScale.XYShrink);
+        }
+
+        private void GameManager_OnBackButtonPress(int playerIndex)
+        {
+            Debug.developerConsoleVisible = !Debug.developerConsoleVisible;
         }
 
         // Yellow
         private void GameManager_OnFaceButtonUpPress(int playerIndex)
         {
+            if (isAnimatingComputerShape) return;
             playerInputReaders[0].SetColor(Yellow);
             playerShapeColor = ShapeColor.Yellow;
         }
@@ -142,6 +180,7 @@ namespace MirrorYou
         // Red
         private void GameManager_OnFaceButtonRightPress(int playerIndex)
         {
+            if (isAnimatingComputerShape) return;
             playerInputReaders[0].SetColor(Red);
             playerShapeColor = ShapeColor.Red;
         }
@@ -149,6 +188,7 @@ namespace MirrorYou
         // Green
         private void GameManager_OnFaceButtonDownPress(int playerIndex)
         {
+            if (isAnimatingComputerShape) return;
             playerInputReaders[0].SetColor(Green);
             playerShapeColor = ShapeColor.Green;
         }
@@ -156,6 +196,7 @@ namespace MirrorYou
         // Blue
         private void GameManager_OnFaceButtonLeftPress(int playerIndex)
         {
+            if (isAnimatingComputerShape) return;
             playerInputReaders[0].SetColor(Blue);
             playerShapeColor = ShapeColor.Blue;
         }
@@ -163,55 +204,132 @@ namespace MirrorYou
         // Shrink Y
         private void GameManager_OnShoulderLeftButtonPress(int playerIndex)
         {
+            if (isAnimatingComputerShape) return;
             Vector3 scale = playerInputReaders[0].transform.localScale;
             playerInputReaders[0].transform.localScale = new(scale.x, 0.5f, scale.z);
-            playerShapeScale = ShapeScale.YShrink;
-            CheckXYShrink();
+            CheckXYShapeScale();
         }
 
         // Grow Y
         private void GameManager_OnTriggerLeftButtonPress(int playerIndex)
         {
+            if (isAnimatingComputerShape) return;
             Vector3 scale = playerInputReaders[0].transform.localScale;
             playerInputReaders[0].transform.localScale = new(scale.x, 1.5f, scale.z);
-            playerShapeScale = ShapeScale.YGrow;
-            CheckXYGrow();
+            CheckXYShapeScale();
         }
 
         // Shrink X
         private void GameManager_OnShoulderRightButtonPress(int playerIndex)
         {
+            if (isAnimatingComputerShape) return;
             Vector3 scale = playerInputReaders[0].transform.localScale;
             playerInputReaders[0].transform.localScale = new(0.5f, scale.y, scale.z);
-            playerShapeScale = ShapeScale.XShrink;
-            CheckXYShrink();
+            CheckXYShapeScale();
         }
 
         // Grow-X
         private void GameManager_OnTriggerRightButtonPress(int playerIndex)
         {
+            if (isAnimatingComputerShape) return;
             Vector3 scale = playerInputReaders[0].transform.localScale;
             playerInputReaders[0].transform.localScale = new(1.5f, scale.y, scale.z);
-            playerShapeScale = ShapeScale.XGrow;
-            CheckXYGrow();
+            CheckXYShapeScale();
         }
 
-        private void CheckXYShrink()
+        private void CheckXYShapeScale()
         {
-            if (playerInputReaders[0].transform.localScale.x < 1f &&
-                playerInputReaders[0].transform.localScale.y < 1f)
-            {
-                playerShapeScale = ShapeScale.XYShrink;
-            }
+            Vector2 scale = playerInputReaders[0].transform.localScale;
+            if (scale.x == 0.5f && scale.y == 0.5f) { playerShapeScale = ShapeScale.XYShrink; return; }
+            if (scale.x == 0.5f && scale.y == 1.5f) { playerShapeScale = ShapeScale.XShrinkYGrow; return; }
+            if (scale.x == 1.5f && scale.y == 0.5f) { playerShapeScale = ShapeScale.XGrowYShrink; return; }
+            if (scale.x == 1.5f && scale.y == 1.5f) { playerShapeScale = ShapeScale.XYGrow; }
         }
 
-        private void CheckXYGrow()
+        private IEnumerator DoComputerShapeAnimation(ShapeTarget oldShape, ShapeTarget newShape)
         {
-            if (playerInputReaders[0].transform.localScale.x > 1f &&
-                playerInputReaders[0].transform.localScale.y > 1f)
+            if (oldShape.Equals(newShape)) yield return null;
+            else
             {
-                playerShapeScale = ShapeScale.XYGrow;
+                isAnimatingComputerShape = true;
+                yield return null;
+
+                float timer = 0f;
+                Material mat = ComputerShape.GetComponent<MeshRenderer>().material;
+                Color oldColor = mat.GetColor("_Color");
+                Color newColor = Red;
+                switch (newShape.ShapeColor)
+                {
+                    case ShapeColor.Yellow: newColor = Yellow; break;
+                    case ShapeColor.Red: newColor = Red; break;
+                    case ShapeColor.Green: newColor = Green; break;
+                    case ShapeColor.Blue: newColor = Blue; break;
+                }
+                Vector2 oldScale = DataExtensions.GetShapeScaleVector(oldShape.ShapeScale);
+                Vector2 newScale = DataExtensions.GetShapeScaleVector(newShape.ShapeScale);
+                float scaleX = newScale.x < 0 ? ComputerShape.transform.localScale.x : newScale.x;
+                float scaleY = newScale.y < 0 ? ComputerShape.transform.localScale.y : newScale.y;
+                newScale = new(scaleX, scaleY);
+                while (timer < ShapeAnimationTime * 0.5f)
+                {
+                    timer += Time.deltaTime;
+                    float alpha = MathExtensions.EaseInOutQuint(timer / ShapeAnimationTime);
+                    float morph = Mathf.Lerp(oldShape.Morph, newShape.Morph, alpha);
+                    float roughness = Mathf.Lerp(oldShape.Roughness, newShape.Roughness, alpha);
+                    Color color = Color.Lerp(oldColor, newColor, alpha);
+                    Vector2 scale = Vector2.Lerp(oldScale, newScale, alpha);
+
+                    mat.SetFloat("_Morph", morph);
+                    mat.SetFloat("_Roughness", roughness);
+                    mat.SetColor("_Color", color);
+
+                    ComputerShape.transform.localScale = scale;
+                    yield return null;
+                }
+                timer = ShapeAnimationTime * 0.5f;
+                DingSfx.Play();
+                while (timer < ShapeAnimationTime)
+                {
+                    timer += Time.deltaTime;
+                    float alpha = MathExtensions.EaseInOutQuint(timer / ShapeAnimationTime);
+                    float morph = Mathf.Lerp(oldShape.Morph, newShape.Morph, alpha);
+                    float roughness = Mathf.Lerp(oldShape.Roughness, newShape.Roughness, alpha);
+                    Color color = Color.Lerp(oldColor, newColor, alpha);
+                    Vector2 scale = Vector2.Lerp(oldScale, newScale, alpha);
+
+                    mat.SetFloat("_Morph", morph);
+                    mat.SetFloat("_Roughness", roughness);
+                    mat.SetColor("_Color", color);
+
+                    ComputerShape.transform.localScale = scale;
+                    yield return null;
+                }
+                mat.SetFloat("_Morph", newShape.Morph);
+                mat.SetFloat("_Roughness", newShape.Roughness);
+                mat.SetColor("_Color", newColor);
+                ComputerShape.transform.localScale = newScale;
             }
+            isAnimatingComputerShape = false;
+            yield return null;
+        }
+
+        private IEnumerator DoCounterCircleFadeAnimation(float targetAlpha, float duration)
+        {
+            float time = 0f;
+            float startAlphaValue = CounterCircle.color.a;
+            float endAlphaValue = targetAlpha;
+
+            while (time < duration)
+            {
+                time += Time.deltaTime;
+                float alphaTime = time / duration;
+                float newAlphaValue = Mathf.Lerp(startAlphaValue, endAlphaValue, alphaTime);
+                CounterCircle.color = new(CounterCircle.color.r, CounterCircle.color.g, CounterCircle.color.b, newAlphaValue);
+                yield return null;
+            }
+            CounterCircle.color = new(CounterCircle.color.r, CounterCircle.color.g, CounterCircle.color.b, endAlphaValue);
+            counter = 0f;
+            yield return null;
         }
     }
 }

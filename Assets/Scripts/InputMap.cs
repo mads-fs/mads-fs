@@ -127,6 +127,15 @@ namespace MirrorYou.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Restart"",
+                    ""type"": ""Button"",
+                    ""id"": ""e4847140-1850-42fa-a942-9a4f99e84013"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -294,6 +303,17 @@ namespace MirrorYou.Input
                     ""action"": ""RightAnalog"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""af1c8058-0a29-4cc0-8cc8-48a41ea130c4"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Restart"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -325,6 +345,7 @@ namespace MirrorYou.Input
             m_Gamepad_ShoulderRight = m_Gamepad.FindAction("ShoulderRight", throwIfNotFound: true);
             m_Gamepad_TriggerLeft = m_Gamepad.FindAction("TriggerLeft", throwIfNotFound: true);
             m_Gamepad_TriggerRight = m_Gamepad.FindAction("TriggerRight", throwIfNotFound: true);
+            m_Gamepad_Restart = m_Gamepad.FindAction("Restart", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -397,6 +418,7 @@ namespace MirrorYou.Input
         private readonly InputAction m_Gamepad_ShoulderRight;
         private readonly InputAction m_Gamepad_TriggerLeft;
         private readonly InputAction m_Gamepad_TriggerRight;
+        private readonly InputAction m_Gamepad_Restart;
         public struct GamepadActions
         {
             private @InputMap m_Wrapper;
@@ -412,6 +434,7 @@ namespace MirrorYou.Input
             public InputAction @ShoulderRight => m_Wrapper.m_Gamepad_ShoulderRight;
             public InputAction @TriggerLeft => m_Wrapper.m_Gamepad_TriggerLeft;
             public InputAction @TriggerRight => m_Wrapper.m_Gamepad_TriggerRight;
+            public InputAction @Restart => m_Wrapper.m_Gamepad_Restart;
             public InputActionMap Get() { return m_Wrapper.m_Gamepad; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -454,6 +477,9 @@ namespace MirrorYou.Input
                 @TriggerRight.started += instance.OnTriggerRight;
                 @TriggerRight.performed += instance.OnTriggerRight;
                 @TriggerRight.canceled += instance.OnTriggerRight;
+                @Restart.started += instance.OnRestart;
+                @Restart.performed += instance.OnRestart;
+                @Restart.canceled += instance.OnRestart;
             }
 
             private void UnregisterCallbacks(IGamepadActions instance)
@@ -491,6 +517,9 @@ namespace MirrorYou.Input
                 @TriggerRight.started -= instance.OnTriggerRight;
                 @TriggerRight.performed -= instance.OnTriggerRight;
                 @TriggerRight.canceled -= instance.OnTriggerRight;
+                @Restart.started -= instance.OnRestart;
+                @Restart.performed -= instance.OnRestart;
+                @Restart.canceled -= instance.OnRestart;
             }
 
             public void RemoveCallbacks(IGamepadActions instance)
@@ -530,6 +559,7 @@ namespace MirrorYou.Input
             void OnShoulderRight(InputAction.CallbackContext context);
             void OnTriggerLeft(InputAction.CallbackContext context);
             void OnTriggerRight(InputAction.CallbackContext context);
+            void OnRestart(InputAction.CallbackContext context);
         }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+
 namespace MirrorYou.Extensions
 {
     public static class MathExtensions
@@ -13,5 +15,8 @@ namespace MirrorYou.Extensions
         /// <returns>The value mapped onto the target range.</returns>
         public static float MapValueToNewScale(float value, float min, float max, float targetMin, float targetMax)
             => (value - min) * ((targetMax - targetMin) / (max - min)) + targetMin;
+
+        public static float EaseInOutQuint(float number)
+            => number < 0.5f ? 16f * number * number * number * number * number : 1f - (float)Math.Pow(-2f * number + 2f, 5f) / 2f;
     }
 }

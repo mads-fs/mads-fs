@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -121,8 +121,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed7d8cca6af4c7f45bd14b369182bf92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  XInputSampling: 20
-  YInputSampling: 10
+  XInputSampling: 50
+  YInputSampling: 50
 --- !u!33 &1864263745141020991
 MeshFilter:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MirrorYou.Data
 {
     [Serializable]
-    public struct ShapeTarget
+    public struct ShapeTarget : IEquatable<ShapeTarget>
     {
         [Range(0f, 1f)]
         public float Roughness;
@@ -12,6 +12,13 @@ namespace MirrorYou.Data
         public float Morph;
         public ShapeColor ShapeColor;
         public ShapeScale ShapeScale;
+
+        public readonly bool Equals(ShapeTarget other)
+            =>
+            Roughness == other.Roughness &&
+            Morph == other.Morph &&
+            ShapeColor == other.ShapeColor &&
+            ShapeScale == other.ShapeScale;
     }
 
     public enum ShapeColor
@@ -24,11 +31,9 @@ namespace MirrorYou.Data
 
     public enum ShapeScale
     {
-        XShrink,
-        XGrow,
-        YShrink,
-        YGrow,
         XYShrink,
-        XYGrow
+        XShrinkYGrow,
+        XGrowYShrink,
+        XYGrow,
     }
 }
