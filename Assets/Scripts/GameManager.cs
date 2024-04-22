@@ -11,10 +11,14 @@ namespace MirrorYou
 {
     public class GameManager : MonoBehaviour
     {
-        public Color Yellow = Color.yellow;
-        public Color Red = Color.red;
-        public Color Green = Color.green;
-        public Color Blue = Color.blue;
+        public Color YellowUp = Color.yellow;
+        public Color YellowDown = Color.yellow;
+        public Color RedUp = Color.red;
+        public Color RedDown = Color.red;
+        public Color GreenUp = Color.green;
+        public Color GreenDown = Color.green;
+        public Color BlueUp = Color.blue;
+        public Color BlueDown = Color.blue;
 
         public PlayerInputManager InputManager;
         public GameObject ComputerShape;
@@ -78,10 +82,10 @@ namespace MirrorYou
                 mat.SetFloat("_Roughness", target.Roughness);
                 switch (target.ShapeColor)
                 {
-                    case ShapeColor.Yellow: mat.SetColor("_Color", Yellow); break;
-                    case ShapeColor.Red: mat.SetColor("_Color", Red); break;
-                    case ShapeColor.Green: mat.SetColor("_Color", Green); break;
-                    case ShapeColor.Blue: mat.SetColor("_Color", Blue); break;
+                    case ShapeColor.Yellow: mat.SetColor("_UpperColor", YellowUp); mat.SetColor("_LowerColor", YellowDown); break;
+                    case ShapeColor.Red: mat.SetColor("_UpperColor", RedUp); mat.SetColor("_LowerColor", RedDown); break;
+                    case ShapeColor.Green: mat.SetColor("_UpperColor", GreenUp); mat.SetColor("_LowerColor", GreenDown); break;
+                    case ShapeColor.Blue: mat.SetColor("_UpperColor", BlueUp); mat.SetColor("_LowerColor", BlueDown); break;
                 }
                 Vector2 scale = DataExtensions.GetShapeScaleVector(target.ShapeScale);
                 float scaleX = scale.x < 0 ? ComputerShape.transform.localScale.x : scale.x;
@@ -173,7 +177,7 @@ namespace MirrorYou
         private void GameManager_OnFaceButtonUpPress(int playerIndex)
         {
             if (isAnimatingComputerShape) return;
-            playerInputReaders[0].SetColor(Yellow);
+            playerInputReaders[0].SetColor(YellowUp);
             playerShapeColor = ShapeColor.Yellow;
         }
 
@@ -181,7 +185,7 @@ namespace MirrorYou
         private void GameManager_OnFaceButtonRightPress(int playerIndex)
         {
             if (isAnimatingComputerShape) return;
-            playerInputReaders[0].SetColor(Red);
+            playerInputReaders[0].SetColor(RedUp);
             playerShapeColor = ShapeColor.Red;
         }
 
@@ -189,7 +193,7 @@ namespace MirrorYou
         private void GameManager_OnFaceButtonDownPress(int playerIndex)
         {
             if (isAnimatingComputerShape) return;
-            playerInputReaders[0].SetColor(Green);
+            playerInputReaders[0].SetColor(GreenUp);
             playerShapeColor = ShapeColor.Green;
         }
 
@@ -197,7 +201,7 @@ namespace MirrorYou
         private void GameManager_OnFaceButtonLeftPress(int playerIndex)
         {
             if (isAnimatingComputerShape) return;
-            playerInputReaders[0].SetColor(Blue);
+            playerInputReaders[0].SetColor(BlueUp);
             playerShapeColor = ShapeColor.Blue;
         }
 
@@ -257,13 +261,13 @@ namespace MirrorYou
                 float timer = 0f;
                 Material mat = ComputerShape.GetComponent<MeshRenderer>().material;
                 Color oldColor = mat.GetColor("_Color");
-                Color newColor = Red;
+                Color newColor = RedUp;
                 switch (newShape.ShapeColor)
                 {
-                    case ShapeColor.Yellow: newColor = Yellow; break;
-                    case ShapeColor.Red: newColor = Red; break;
-                    case ShapeColor.Green: newColor = Green; break;
-                    case ShapeColor.Blue: newColor = Blue; break;
+                    case ShapeColor.Yellow: newColor = YellowUp; break;
+                    case ShapeColor.Red: newColor = RedUp; break;
+                    case ShapeColor.Green: newColor = GreenUp; break;
+                    case ShapeColor.Blue: newColor = BlueUp; break;
                 }
                 Vector2 oldScale = DataExtensions.GetShapeScaleVector(oldShape.ShapeScale);
                 Vector2 newScale = DataExtensions.GetShapeScaleVector(newShape.ShapeScale);

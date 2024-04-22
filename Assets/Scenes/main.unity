@@ -605,10 +605,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f0fe820182da9543ae0a32710681a40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Yellow: {r: 1, g: 0.7686275, b: 0.43921572, a: 1}
-  Red: {r: 0.86666673, g: 0.34117648, b: 0.27450982, a: 1}
-  Green: {r: 0.25490198, g: 0.64705884, b: 0.5372549, a: 1}
-  Blue: {r: 0.2784314, g: 0.5764706, b: 0.6862745, a: 1}
+  YellowUp: {r: 1, g: 1, b: 0.7372549, a: 1}
+  YellowDown: {r: 1, g: 0.7686275, b: 0.43921572, a: 1}
+  RedUp: {r: 0.8862746, g: 0.1254902, b: 0.4666667, a: 1}
+  RedDown: {r: 0.50980395, g: 0, b: 0.4039216, a: 1}
+  GreenUp: {r: 0.07058824, g: 0.7490196, b: 0.58431375, a: 1}
+  GreenDown: {r: 0.7019608, g: 0.8862746, b: 0.56078434, a: 1}
+  BlueUp: {r: 0, g: 0.40000004, b: 1, a: 1}
+  BlueDown: {r: 0.25490198, g: 0.627451, b: 1, a: 1}
   InputManager: {fileID: 440418636}
   ComputerShape: {fileID: 7996204220718836626}
   InputVariance: 0.2
@@ -712,7 +716,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: edc733f2a3d6e9146b7748d8b76969f6, type: 2}
+  - {fileID: 2100000, guid: e37588ee93c07ad48b05183348fcb97a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -988,7 +992,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.8
+  m_fontSize: 64.1
   m_fontSizeBase: 23.45
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1760,7 +1764,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: edc733f2a3d6e9146b7748d8b76969f6, type: 2}
+  - {fileID: 2100000, guid: e37588ee93c07ad48b05183348fcb97a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
